@@ -23,7 +23,7 @@ const inputOutputDetails = [
   "The input consists of an integer \( n \) \( (1 < n < 1000) \) on the first line, followed by a string of length \( n \). The output is a string."
 ];
 
-const Accordion = () => {
+const Accordion = (props) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -88,28 +88,26 @@ const Accordion = () => {
   };
 
   const handleCodeforcesRedirect = () => {
-    const urls = [
-      "https://codeforces.com",
-      "https://codeforces.com",
-      "https://codeforces.com",
-      "https://codeforces.com",
-      "https://codeforces.com",
-      "https://codeforces.com",
-      "https://codeforces.com",
-      "https://codeforces.com"
-    ];
-    window.open(urls[current], "_blank");
+    window.open("https://codeforces.com/contestInvitation/3a702ad16429029a4f6ded7e5f3734f52553550a", "_blank");
   };
+  
 
   const handleDownloadZip = () => {
-    const zipFileUrl = `https://example.com/binary-files/problem${current + 1}.zip`;
+    const os = props.os.toLowerCase();  
+
+    const filePrefix = String.fromCharCode(65 + current); 
+
+    const zipFilePath = `/assets/${os}/${filePrefix}_${os}.zip`;
+  
     const link = document.createElement("a");
-    link.href = zipFileUrl;
-    link.download = `problem${current + 1}.zip`;
+    link.href = zipFilePath;
+    link.download = `${filePrefix}_${os}.zip`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+  
+
 
   return (
     <div className="container">
