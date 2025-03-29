@@ -1,123 +1,185 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Accordion.css";
-import Winques from './Windows_question.json'
-import LMques from './Linux&Mac_Question.json'
-import { Link, NavLink } from "react-router-dom"
-import Latex from "react-latex";
-import DelayedStart from "./DelayedStart";
-import Py from "./Py";
 
-const Accordion = (props) => {
+const questionNames = [
+  "Life, the Universe and Everything",
+  "50 Shades of Gray",
+  "Seven Ate Nine",
+  "BAABBB",
+  "Brackets",
+  "Modified 0-1-1-2",
+  "Trust me bro",
+  "String stuff"
+];
+
+const inputOutputDetails = [
+  "The input is a single integer, and the output is a single integer.",
+  "The input consists of an integer and a binary string separated by a space, and the output is a single integer.",
+  "The input is an integer between 1 and 15, and the output is a 64-bit integer.",
+  "The input consists of an integer \( n < 10^5 \) on the first line, followed by \( n \) uppercase strings of length ≤ 4, separated by spaces. The output is a string.",
+  "The input consists of an integer \( n \) \( (1 \leq n \leq 100000) \) on the first line, followed by a string of brackets \( ( \) and \( ) \) of length \( n \). The output is a string.",
+  "The input consists of three integers \( a, b, \) and \( n \) \( (1 \leq a, b \leq 10^9, 1 \leq n \leq 100000) \). The output is an integer.",
+  "NO REQUESTS ALLOWED FOR THIS PROBLEM",
+  "The input consists of an integer \( n \) \( (1 < n < 1000) \) on the first line, followed by a string of length \( n \). The output is a string."
+];
+
+const Accordion = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  if (props.os === "linux") {
-    var loc = "Linux/"
-    var file = LMques
-  }
-  else if (props.os === "macos") {
-    var loc = "Macos/"
-    var file = LMques
-  } else {
-    var loc = "Windows/"
-    var file = Winques
-  }
+  const [current, setCurrent] = useState(0);
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
+  const handleClick = (index) => {
+    setCurrent(index);
+    setOutput("");
+    setError("");
+    setInput("");
+  };
 
+  const handleDecrypt = async () => {
+    setOutput("");
+    setError("");
+
+    if (!input.trim()) {
+      setError("Input cannot be empty.");
+      return;
+    }
+
+    if (current === 6) {
+      setError("No requests allowed for this problem.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const problemEndpoints = [
+        "/problem1", "/problem2", "/problem3", "/problem4",
+        "/problem5", "/problem6", "/problem7", "/problem8"
+      ];
+
+      const response = await fetch(`https://decrypt-api-0mny.onrender.com/api${problemEndpoints[current]}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input: input.trim() }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        setError(`Error ${response.status}: ${errorData.reason || "Something went wrong"}`);
+        return;
+      }
+
+      const data = await response.json();
+      setOutput(data.output || "No output received");
+      setError("");
+
+    } catch (err) {
+      console.error("Decryption Error:", err);
+      setError(err.message || "An unexpected error occurred during decryption.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCodeforcesRedirect = () => {
+    const urls = [
+      "https://codeforces.com",
+      "https://codeforces.com",
+      "https://codeforces.com",
+      "https://codeforces.com",
+      "https://codeforces.com",
+      "https://codeforces.com",
+      "https://codeforces.com",
+      "https://codeforces.com"
+    ];
+    window.open(urls[current], "_blank");
+  };
+
+  const handleDownloadZip = () => {
+    const zipFileUrl = `https://example.com/binary-files/problem${current + 1}.zip`;
+    const link = document.createElement("a");
+    link.href = zipFileUrl;
+    link.download = `problem${current + 1}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
+    <div className="container">
+      <div className="unified-box">
+        <aside className="sidebar">
+          <ul id="questionList">
+            {questionNames.map((name, idx) => (
+              <li
+                key={idx}
+                className={current === idx ? 'active' : ''}
+                onClick={() => handleClick(idx)}
+              >
+                {name}
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-    <div className="accordion-js">
-      {!props.display ? <h1 className="texttrue"><DelayedStart /></h1> :
-        <div>
-          <div style={{ textAlign: "center" }} className="questions-title">Questions</div>
+        <main className="content">
+          <div className="quiz-card">
+            <h2>{questionNames[current]}</h2>
 
-          <div className="row">
-            <div className="col">
-              <div className="tabs">
-
-              <div id="btn_container">
-                  <div className="accordbuttons">
-                    <NavLink to="/" className='btn backtohomereal backtohome' style={{ marginTop: "2rem", alignSelf: "left" }} id="HomeButton">
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                      Back to Home
-                    </NavLink>
-
-                    <Link to={{ pathname: "https://docs.google.com/document/d/1BaZVAFCw0ZUW8zvN7_AB706xvcmUFCEHJU6UpJ063Fs/edit?usp=sharing" }} target="_blank" className='btn backtohomereal backtohome instructions' style={{ marginTop: "2rem", alignSelf: "right" }} id="HomeButton">
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                      Instructions
-                    </Link>
-                  </div>
-                </div>
-
-                {
-                  file.map((questions, key) => (
-
-                    <div className="tab" key={key}>
-                      <input type="checkbox" className="input" id={questions.id} />
-
-                      <label className="tab-label" for={questions.id} style={{ fontSize: "1.2rem" }}>
-                        Question {questions.number}
-                      </label>
-                      <div className="tab-content">
-                        <div className="navigators">
-                          <div className="fakeButtons fakeClose"></div>
-                          <div className="fakeButtons fakeMinimize"></div>
-                          <div className="fakeButtons fakeZoom"></div>
-                        </div>
-                        <div className="prompt">
-                          <br />
-                          <p className="line1"><Latex displayMode={false}>{questions.description}</Latex></p>
-                          <p className="instructions">Instructions: {questions.inst}</p>
-
-                          <div className="output">
-                            <Py qid={questions.id} />
-                          </div>
-                        </div>
-
-                          <div className="bottom-container">
-                          <p className="alternate">Alternate Method</p>
-                          <div className="btn_container">
-                            <Link className="btn backtohome" to={"/assets/" + loc + questions.download} target="_blank" download>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              Download Link</Link>
-                            <br />
-                            <br />
-
-                            <a href="#" className='btn backtohome' id={questions.id} onClick={(e) => { window.open(questions.HRlink) }}>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              HackerRank
-                            </a></div>
-                            </div>
-                      </div>
-                    </div>
-                  ))
-                }
-
-                
-              </div>
+            <div className="input-output-info">
+              <pre>{inputOutputDetails[current]}</pre>
             </div>
 
-          </div>
+            <textarea
+              className="answer-input"
+              placeholder="Type your query..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
 
-        </div>
-      }
+            <div className="btn-group">
+              <button 
+                onClick={handleDecrypt} 
+                className="decrypt-btn"
+                disabled={isLoading}
+              >
+                {isLoading ? "Decrypting..." : "Decrypt"}
+              </button>
+
+              <button 
+                onClick={handleCodeforcesRedirect} 
+                className="btn"
+              >
+                Codeforces
+              </button>
+
+              <button 
+                onClick={handleDownloadZip} 
+                className="btn"
+              >
+                Download Zip
+              </button>
+            </div>
+
+            {output && (
+              <div className="output-box">
+                <h3>Output:</h3>
+                <p>{output}</p>
+              </div>
+            )}
+
+            {error && <p className="error-msg">{error}</p>}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
 
 export default Accordion;
-

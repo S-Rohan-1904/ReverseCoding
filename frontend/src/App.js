@@ -13,16 +13,6 @@ import Py from './components/Py';
 
 export default function App() {
 
-  const [time,setTime] = useState(0)
-  const [show,setShow] = useState(false)
-
-  useEffect(() => {
-    axios.get(`https://worldtimeapi.org/api/timezone/Asia/Kolkata`)
-    .then(res => {
-        if ((res.data.unixtime)>1677508200)
-          setShow(true)
-      })        
-}, [])
 
 
 
@@ -40,9 +30,9 @@ export default function App() {
    <BrowserRouter>
    <Switch>
         <Route path="/" exact component={Main} />
-        <Route path="/linux" render={() => <Accordion display={show} os={"linux"} />} />
-        <Route path="/windows" render={() => <Accordion display={show} os={"windows"} />} />   
-        <Route path="/macos" render={() => <Accordion display={show} os={"macos"} />}/>          
+        <Route path="/linux" render={() => <Accordion os={"linux"} />} />
+        <Route path="/windows" render={() => <Accordion  os={"windows"} />} />   
+        <Route path="/macos" render={() => <Accordion  os={"macos"} />}/>          
       </Switch>
     </BrowserRouter>
    
